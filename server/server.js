@@ -3,6 +3,8 @@ import cors from 'cors';
 import "dotenv/config";
 import multer from 'multer';
 import connectDB from './config/db.js'
+import authRouter from './Routes/authRoutes.js';
+import employeeRouter from './Routes/EmployeeRoutes.js';
 
 const app  = express();
 const PORT = process.env.PORT || 4000;
@@ -17,6 +19,8 @@ app.use(multer().none()); // For parsing multipart/form-data
 app.get('/', (req, res) => {
  res.send('Welcome to the server!');
 });
+app.use('/api/auth', authRouter);
+app.use('/api/employees', employeeRouter);
 
 /** Start Server */
 (async () => {
