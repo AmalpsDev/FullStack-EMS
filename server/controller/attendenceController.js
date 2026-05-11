@@ -66,6 +66,25 @@ export const ClockInOut = async (req, res) => {
     methods : get
     endpoint : /api/attendence
 */
-export const ClockOut = async (req, res) => {
+export const getAttendence = async (req, res) => {
+    try {
+        const session = req.session;
+        const employee = await Employee.findOne({ userId: session.userId })
+        if (!employee) return res.status(404).json({ error: "Employee not found" });
+        if (employee?.isDeleted) return res.status(403).json({
+            error: "Your account is deactivated. You cannot clock in/out"
+        })
+        const limit = parseInt(req.query.limit || 30);
+        const history = await Attendence.find({
+            employeeId: employee._id
+        }).sort({ date: -1 }).limit(limit);
 
+        return res.json({
+            data: history,
+            employee: { isDeleted: employee.isDeleted }
+        })
+
+    } catch (error) {
+        return res.status(500).json({ error: "Failed to get attendence" });
+    }
 }
