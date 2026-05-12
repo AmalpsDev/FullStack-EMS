@@ -1,5 +1,5 @@
-import Attendence from "../models/Attendence";
-import Employee from "../models/Employee";
+import Attendence from "../models/Attendence.js";
+import Employee from "../models/Employee.js";
 
 /* clock in/out, for employee attendance tracking 
     methods : post
