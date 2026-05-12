@@ -3,9 +3,9 @@
     endpoint - /api/employees
 */
 
-import Employee from "../models/Employee";
+import Employee from "../models/Employee.js";
 import bcrypt from "bcrypt";
-import User from "../models/User";
+import User from "../models/User.js";
 
 export const getEmployees = async (req, res) => {
     try {
