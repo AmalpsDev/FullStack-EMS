@@ -8,8 +8,7 @@ export const inngest = new Inngest({ id: "fullstack-ems" });
 
 // Auto check-out for employee
 const autoCheckOut = inngest.createFunction(
-    { id: "auto-check-out" },
-    { event: "employee/check-out" },
+    { id: "auto-check-out", triggers: [{ event: "employee/check-out" }] },
     async ({ event, step }) => {
         const { employeeId, attendenceId } = event.data;
 
@@ -41,13 +40,12 @@ const autoCheckOut = inngest.createFunction(
 
 /**Send Email to admin ,If admin doesn't take action on leave application within 24 hours */
 const leaveApplicationReminder = inngest.createFunction(
-    { id: "leave-application-reminder" },
-    { event: "leave/pending" },
+    { id: "leave-application-reminder", triggers: [{ event: "leave/pending" }] },
     async ({ event, step }) => {
         const { leaveApplicationId } = event.data;
 
         /**Wait for 24 hours */
-        await step.sleepUntil("wait-for=the-24-hours", new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
+        await step.sleepUntil("wait-for-24-hours", new Date(new Date().getTime() + 24 * 60 * 60 * 1000))
         const leaveApplication = await LeaveApplication.findById(leaveApplicationId);
 
         if (leaveApplication?.status === "PENDING") {
@@ -61,13 +59,12 @@ const leaveApplicationReminder = inngest.createFunction(
 /**Cron : Check attendence at 11:30 AM  IST (06:00 UTC) and email absent employees  */
 
 const attendenceReminderCron = inngest.createFunction(
-    { id: "attendence-reminder-cron" },
-    { cron: "0 0 6 * * *" },/** 06:00 UTC = 11.30 AM IST*/
+    { id: "attendence-reminder-cron", triggers: [{ cron: "0 0 6 * * *" }] },/** 06:00 UTC = 11.30 AM IST*/
     async ({ step }) => {
         const today = await step.run("get-today-date", () => {
 
             /**step 1 : Get today's date range */
-            const startUTC = new Date(new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkate" }) + "T00:00:00 + 05:30");
+            const startUTC = new Date(new Date().toLocaleString("en-CA", { timeZone: "Asia/Kolkata" }).split(',')[0] + "T00:00:00+05:30");
             const endUTC = new Date(startUTC.getTime() + 24 * 60 * 60 * 1000);
             return {
                 startUTC: startUTC.toISOString(),
